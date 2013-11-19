@@ -9,9 +9,9 @@
 
 ### Dependencies:
 
-mysql
-ruby
-activerecords (bundled with rails)
+- mysql
+- ruby
+- activerecords (bundled with rails)
 
 ### Install mysql:
 
