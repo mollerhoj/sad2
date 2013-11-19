@@ -1,6 +1,6 @@
 class Reporter
   def initialize (output,bacon_indexer)
-    @output = output
+    @output = output ||= STDOUT
     @bacon_indexer = bacon_indexer ||= BaconIndexer.new
   end
 
