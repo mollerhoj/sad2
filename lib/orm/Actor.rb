@@ -1,3 +1,5 @@
+require 'active_record'
+
 class Actor < ActiveRecord::Base
   has_many :roles
   has_many :movies, through: :roles
@@ -5,4 +7,5 @@ class Actor < ActiveRecord::Base
   #last_name
   #gender
   #film_count
+  attr_accessor :name
 end
