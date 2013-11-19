@@ -23,4 +23,6 @@ brew install mysql
 
 gem install mysql -- --with-mysql-config=/Applications/MAMP/Library/bin/mysql_config
 
+# TODO
 
+- What is the use of actors2 table in database?
