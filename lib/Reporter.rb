@@ -11,9 +11,9 @@ class Reporter
   end
 
   def find_person_by_name name
-    p = Person.new 
-    p.name = name
-    p
+    a = Actor.new 
+    a.name = name
+    a
   end
 end
 

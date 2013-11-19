@@ -1,6 +1,6 @@
 class BaconIndexer
-  def index person
-    if person.name == 'Kevin Bacon'
+  def index actor
+    if actor.name == 'Kevin Bacon'
       0
     else
       5
