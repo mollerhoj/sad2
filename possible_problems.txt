@@ -1,0 +1,32 @@
+| Interval scheduling |
+How many movies could one person watch if started in 1980, and saw X minutes
+per year? And which movies should he choose?
+
+| Weighted Interval scheduling |
+What if he wanted to see the highest possible sum of movie ranks? (A movie of
+rank 4 counts as 4)
+
+| Knapsack |
+You want to know all the actors in as many movies as possible. Know can only
+remember X actors in total. What movies should you choose?
+
+|Counting Inversions|
+??
+
+|Network flow|
+Two actors have a work-connection if there exists a path from their colleagues
+to one another.
+
+If you wanted to disconnect A and B, how many people would you have to kill,
+and who?
+
+For every independent work-connection between two actors, there is a chance
+that they fall in love. What are the chances of romance between A and B?
+
+|Vertex Cover|
+If someone says the name of an actor, you know that actor or one of his
+colleagues. How many actors do you have to know, and who?
+
+|Load balancing|
+If the cinema can show X movies at the time, how long would it approximately take to
+show all movies?
