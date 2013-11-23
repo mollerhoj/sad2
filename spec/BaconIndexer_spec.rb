@@ -1,32 +1,27 @@
-require 'BaconIndexer'
-require 'orm/Actor'
+require 'Spec_helper'
 
 describe BaconIndexer do
-  context "Find index of Kevin Bacon" do 
+  context "Kevin Bacon himself" do 
     it "should return 0" do 
       bacon_indexer = BaconIndexer.new 
-      kevin_bacon = Actor.new
-      kevin_bacon.name = 'Kevin Bacon'
+      kevin_bacon = Actor.find(22591)
       bacon_indexer.index(kevin_bacon).should eq(0)
     end
   end
 
-  context "Find index of John Wayne" do 
-    it "should return 3" do 
-      pending
+  context "A colleage of Kevin Bacon" do 
+    it "should return 1" do 
       bacon_indexer = BaconIndexer.new 
-      kevin_bacon = Actor.new
-      kevin_bacon.name = 'John Wayne'
-      bacon_indexer.index(kevin_bacon).should eq(3)
+      al_pacino = Actor.find(509689)
+      bacon_indexer.index(al_pacino).should eq(1)
     end
   end
 
-  context "Find index of Jim Carry" do 
+  context "Someone who has no connection" do 
     it "should return 5" do 
       bacon_indexer = BaconIndexer.new 
-      kevin_bacon = Actor.new
-      kevin_bacon.name = 'John Wayne'
-      bacon_indexer.index(kevin_bacon).should eq(5)
+      kevin_bacon = Actor.find(4306)
+      bacon_indexer.index(kevin_bacon).should eq(nil)
     end
   end
 
