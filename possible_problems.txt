@@ -7,7 +7,7 @@ What if he wanted to see the highest possible sum of movie ranks? (A movie of
 rank 4 counts as 4)
 
 | Knapsack |
-You want to know all the actors in as many movies as possible. Know can only
+You want to know all the actors in as many movies as possible. You can only
 remember X actors in total. What movies should you choose?
 
 |Counting Inversions|
