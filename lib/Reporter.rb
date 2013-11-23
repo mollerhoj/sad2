@@ -1,7 +1,8 @@
 class Reporter
-  def initialize (output,bacon_indexer)
+  def initialize (output=nil,bacon_indexer=nil,movie_packer=nil)
     @output = output ||= STDOUT
     @bacon_indexer = bacon_indexer ||= BaconIndexer.new
+    @movie_packer = movie_packer ||= MoviePacker.new
   end
 
   def report_bacon_index last_name
@@ -10,10 +11,13 @@ class Reporter
     @output.puts "The bacon index of #{last_name} is #{bacon_index}"
   end
 
-  def find_person_by_name name
-    a = Actor.new 
-    a.name = name
-    a
+  def report_movies_fit_on_disk size
+    movies = @movie_packer.pack size
+    movie_names = []
+    movies.each do |m|
+      movie_names << m.name
+    end
+    @output.puts "These movies would fill up atleast half of the disk: #{movie_names.to_sentence}"
   end
 end
 
