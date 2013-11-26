@@ -3,3 +3,4 @@
 *.log
 *.fls
 asserts/*
+references/*
