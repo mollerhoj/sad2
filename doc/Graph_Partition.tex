@@ -1,0 +1,75 @@
+\newpage
+\chapter{Graph Partitioning}
+\label{chap:Graph_Partitioning}
+\section{Motive}
+The rating system is meant  be be used as a guide to  movies a user or a group
+of users might find enjoyable. In order to choose a movie to watch, users can follow a
+number of different strategies, ranging from simple to very sophisticated.
+A simple strategy would be to simply pick the movies with the highest rating
+that a none of the users have already watched. In order to be guesses about which movies  a particular user might like, I\ can be useful to split the users in to multiple categories. In the following section, we will look at different strategies that can be used to split the users into such groups.
+
+Let us define a graph the following way:
+For each user, create a node.
+If two users have rated the same movie, create an edge between them.
+Let all edges have weights calculated the following way:
+
+10-\textbar a-b\textbar\ 
+
+Our goal is then to split this graph into multiple usergroups.
+
+The has been a lot of research on graph partitioning (refs), in the following section, we will look at a few viable algoritms.
+
+\section{Defition af terms}
+
+\begin{description}
+\item[Contracting] 
+text
+\item[Uncontracting] 
+text
+\item[Multilevel methods] 
+text
+
+\end{description}\section{Kernighan Lin algoritm}
+The Kernighan Lin algoritm splits a graph into mulitiple partitions. One major drawback of this method is that it is very slow:\  O(n^2logn)  (ref:HighQuality Graph Partitioning  p 28). 
+
+Can perform better using Fiduccia-Mattheyses optimasation,   
+
+\section{Fiduccia-Mattheyses}
+\section{Ford-Fulkerson}
+The Ford-Fulkerson finds the minimal cut in the graph. In order the split the graph into 2 partitions of almost equal size, we have experimented with the following algoritm:
+
+Let M be the minimum size of any subgraph
+Let M*2 be the maximum size of any subgraph
+
+Choose 2 nodes s and t at random.
+
+If a min-cut. If one partition is too small. -> Collapse.
+
+
+Say: Choose s and t. The costs are increased the closer an edge is to the
+nodes.
+Maybe an s, and all others are t's..?
+Compute the flow from two ends?
+
+Heuristic method:
+Kernighan–Lin algorithm
+
+function Kernighan-Lin(G(V,E)):
+ 2      determine a balanced initial partition of the nodes into sets A and B
+ 3      A1 := A; B1 := B
+ 4      do
+ 5         compute D values for all a in A1 and b in B1
+ 6         for (n := 1 to |V|/2)
+ 7            find a[i] from A1 and b[j] from B1, such that g[n] = D[a[i]] + D[b[j]] - 2*c[a[i]][b[j]] is maximal
+ 8            move a[i] to B1 and b[j] to A1
+ 9            remove a[i] and b[j] from further consideration in this pass
+ 10           update D values for the elements of A1 = A1 / a[i] and B1 = B1 / b[j]
+ 11        end for
+ 12        find k which maximizes g_max, the sum of g[1],...,g[k]
+ 13        if (g_max > 0) then
+ 14           Exchange a[1],a[2],...,a[k] with b[1],b[2],...,b[k]
+ 15     until (g_max <= 0)
+ 16  return G(V,E)
+
+Min cut
+
