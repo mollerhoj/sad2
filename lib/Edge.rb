@@ -5,14 +5,20 @@ class Edge
 
   #custom values:
   attr_accessor :pay
+  attr_accessor :weight
 
-  def initialize(from,to)
-    @from = from
-    @to = to
+  def initialize(dest,weight=nil)
+    @from = dest[0]
+    @to = dest[1]
+    @weight = weight
   end
 
   def to_s
-    "#{@from}-#{@to}"
+    if not weight
+      "#{@from}---#{@to}"
+    else
+      "#{@from}-#{weight}-#{@to}"
+    end
   end
 
   def min_by

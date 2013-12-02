@@ -23,4 +23,43 @@ describe Node do
     n.mark
     n.free?.should eq(false)
   end
+
+  context "has edges" do
+    let(:graph) {Graph.new}
+    let(:n0) {graph.nodes[0]}
+    let(:n1) {graph.nodes[1]}
+    let(:n2) {graph.nodes[2]}
+    let(:n3) {graph.nodes[3]}
+
+    before(:each) do
+      graph.add_node Node.new(0)
+      graph.add_node Node.new(1)
+      graph.add_node Node.new(2)
+      graph.add_node Node.new(3)
+      graph.add_edge Edge.new([n0,n1],3)
+      graph.add_edge Edge.new([n1,n2],1)
+      graph.add_edge Edge.new([n3,n1],6)
+      graph.add_edge Edge.new([n2,n3],7)
+    end
+
+    it "has neighbors" do
+      puts n1.neighbors.should eq([n2,n0,n3])
+    end
+
+    it "has out" do
+      n1.out.size.should eq(1)
+    end
+
+    it "has in" do
+      n1.in.size.should eq(2)
+    end
+
+    it "has edges" do
+      n1.edges.size.should eq(3)
+    end
+
+    it "has relations" do
+      n1.relations.size.should eq(3)
+    end
+  end
 end

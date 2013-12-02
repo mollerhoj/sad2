@@ -7,45 +7,62 @@ class Graph
   attr_accessor :edges
 
   def initialize
-    @nodes = [] 
+    @nodes = []
     @edges = []
-  end
-
-  def build_edges(list)
-    list.each do |vec|
-      build_edge vec[0],vec[1]
-    end
-  end
-
-  def build_nodes(list)
-    list.each do |vec|
-      build_node vec[0],vec[1]
-    end
-  end
-
-  def build_edge from_id, to_id
-    from = build_node from_id
-    to = build_node to_id
-    add_edge Edge.new(from,to)
-  end
-
-  def build_node id,value=nil
-    if not @nodes[id]
-      @nodes[id] = Node.new id,value
-    end
-    @nodes[id]
   end
 
   def add_edge edge
     @edges << edge
-    edge.to.in << edge
-    edge.from.out << edge
+    add_edge_to_its_nodes edge
+    edge
   end 
+
+  def A
+    return @nodes.select {|n| n.owner == :A}
+  end
+
+  def B
+    return @nodes.select {|n| n.owner == :B}
+  end
+
+  def X
+    return @nodes.select {|n| n.value == :A}
+  end
+
+  def Y
+    return @nodes.select {|n| n.value == :B}
+  end
+
+  def edges_between nodes
+    edges = []
+    edges += nodes[0].out.select{|e| e.to == nodes[1]}
+    edges += nodes[1].out.select{|e| e.to == nodes[0]}
+    edges
+  end
+
+  def A_free
+    return @nodes.select {|n| n.owner == :A and n.free?}
+  end
+
+  def B_free
+    return @nodes.select {|n| n.owner == :B and n.free?}
+  end
+
+  def add_node node
+    @nodes << node
+    node
+  end
 
   def to_s
     @edges.inject("\n") do |str,edge|
       str = str + edge.to_s + "\n"
     end
+  end
+
+  private
+  def add_edge_to_its_nodes edge
+    edge.from.out << edge
+    edge.to.in << edge
   end
 
 end
