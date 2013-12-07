@@ -1,25 +1,30 @@
 \chapter{Introduction}
-\label{chap:Introduction}
-\section{Abstract}
-A short Abstract
-\section{Goal}
-The goal of this project!
-\section{Method}
-The method used to reach the goal
-\begin{enumerate}
-  \item I will do this
-  \item and this 
-  \item maybe this
+\section{Introduction}
+This report was prepared at the IT University of Copenhagen in the fall 2013 as a project in the course Algorithm Design II. The goal of the project is to examine 2-3 algorithmic problems and come up with viable solutions. The report consist of two parts, dealing with separate problems, the first being restricted to movie data, and the other being more open. However, we have chosen to work with movie data in both parts of the project.
 
-\end{enumerate}
-\section{Limitations}
-Limitations of this project:
-\begin{itemize}
-  \item Bad thing.
-  \item Another bad thing.
-\end{itemize}
-\section{Prerequisites}
-The following is required to read this project.
+First we will briefly describe the approaches and the dataset we have been working with, and then the two individual parts of the project are presented.
+
+\section{Preliminaries}
+In this section we will provide an overview of the most important algorithmic approaches we will be using throughout the rest of the report. 
+
+\subsection{Streaming}
+In the stream model, the amount of data is too large to fit in main memory and so is not available for random access. Rather, the input is assumed to arrive in arbitrary order as a stream and can be examined only in one or a few passes \cite{data-streams}. Streaming algorithms can allow for processing of data in real-time without completely storing it. These constraints mean that the algorithm may produce an approximate answer based on a summary of the data that can be kept in an amount of memory considerably smaller than the input size. 
+\subsection{MapReduce}
+MapReduce is a programming model for processing huge amounts of data in a parallel, distributed manner on a cluster of machines\cite{filtering,text-processing}. The input to the MapReduce algorithm and all intermediate data is stored as key-value pairs and computation proceeds in rounds. Each round consists of three steps: map, shuffle and reduce. In the map phase, the input is processed one pair at a time. Then all pairs emitted by the mappers are shuffled and pairs that share the same key are aggregated and sent to one machine. Finally, all values associated with the same key are processed together during the reduce phase.
+
+A round in MapReduce can be very expensive as the overhead of moving data between machines is usually large and may dominate the overall running time of the program. Therefore it is essential to minimize the number of rounds to achieve an efficient MapReduce computation.
+
+The MapReduce approach was originally developed by Google and is the standard for large scale data analysis today. A popular open-source implementation is Apache Hadoop which also available on the Amazon platform. Hadoop can also run on a single machine, which is how we will use it in this project.
+
+
+
+\section{Dataset}
+MovieLens is a recommender system and website\cite{movielens}, collecting user recommendations on movies. We have chosen to work with the MovieLens dataset\cite{grouplens} which contains information about movies, user ratings and tags.
+
+There are datasets in three different sizes, but we will mainly be using the ones called 1M and 10M which share the following structure: Data is stored in three files, containing one entry per line. An entry in the movies.dat file consists of a movie id, movie title and a list of genres. An entry in the ratings.dat file represents a user rating on a single movie. It consists of a user id, movie id, a rating (integer value from 1 to 5) and a timestamp. Each user in the dataset has rated at least 20 movies. The third file contains information about tags, which we are not going to use in this project and thus will not describe in detail.
+
+\section{Code}
+As part of the project, some of the algorithms discussed in this report have been implemented for instructive purposes. Please find the code on the enclosed CD, which we will also refer to throughout the report. The CD includes a readme file explaining the structure of its contents. 
 
 \section{Reading guide}
 How this project should be read!
