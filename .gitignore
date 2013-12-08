@@ -2,5 +2,8 @@
 *.aux
 *.log
 *.fls
+*.txt
 asserts/*
 references/*
+notes/*
+data/*
