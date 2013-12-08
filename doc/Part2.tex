@@ -71,13 +71,14 @@ Lin-Kernighan proceeds in the following way:
 \begin{lstlisting}
 First, determine d for all nodes.
 Then repeat Q times:
-        By lemma 1, find the nodes for with a swap will result
-        in the highest possible gain.
-        Swap those nodes and remove them from further considerations
-        in this step.*
-In the sequence of swaps executed, find what number of swaps that
-results in the minimum T. Save only those swaps and repeat the procedure.
-If no series of swaps results in a lower T value, then terminate. 
+        By lemma 1, find the nodes for with a swap will
+        result in the highest possible gain.
+        Swap those nodes and remove them from further
+        considerations in this step.*
+In the sequence of swaps executed, find what number of
+swaps that results in the minimum T. Save only those
+swaps and repeat the procedure. If no series of swaps
+results in a lower T value, then terminate. 
 \end{lstlisting}
 
 * Note that the best possible swap does not necessarily result in a lower
@@ -96,6 +97,7 @@ We have implemented the Lin-Kernighan algorithm in ruby 2.0.0. LinKernighan.rb u
 In order to measure the quality of the solution found by our implementation, we compare the value of T before and after each run. Recall that T is the sum of external weights of the partitioned graph. The algorithm is executed with part of the MovieLens M1 dataset as input:
 
 \begin{center}
+\scalebox{0.9}{
 \begin{tabular}{| l | l | l | l | l | l |}
 \hline
 Number of edges & Number of nodes & Q & CPU time/sec & T before & T after \\
@@ -107,7 +109,7 @@ Number of edges & Number of nodes & Q & CPU time/sec & T before & T after \\
 215195 & 669 & 67 & 324.47 & 107504.96 & 103674.83\\
 unknown & 6040 & 604 & unknown & unknown & unknown \\
 \hline
-\end{tabular}
+\end{tabular}}
 \end{center}
 
 The seed to the random partition has been the same in every example. Only the time it takes the run the algorithm has been measured (Not the time used to parse the data). The time and T values are the average of 10 runs. A 2.4 Gz i5 core MacBook Pro was used as test machine. As the test data shows, the implementation is too slow to compute large dataset within a reasonable time. In order to improve execution speed, we used the profiler ruby-prof\cite{rubyprof} to find bottlenecks. We have introduced the following optimisations:
@@ -119,6 +121,7 @@ The seed to the random partition has been the same in every example. Only the ti
 However, after the optimizations the implementation was still too slow to compute large dataset within a reasonable time:
 
 \begin{center}
+\scalebox{0.9}{
 \begin{tabular}{| l | l | l | l | l | l |}
 \hline
 Number of edges & Number of nodes & Q & CPU time/sec & T before & T after
@@ -131,7 +134,7 @@ Number of edges & Number of nodes & Q & CPU time/sec & T before & T after
 215195 & 669 & 67 & 243.39 & 107504.96 & 103674.83\\
 unknown & 6040 & 604 & unknown & unknown & unknown \\
 \hline
-\end{tabular}
+\end{tabular}}
 \end{center}
 
 The algorithm is highly dependent on the initial cut of the graph. To increase the chance of a cut with a low value of T, we can generate a number of random partitions, calculate the T value of each, and choose the partition with the lowest value. (In implementation, the seed to the random function resulting in best partition is used to recompute the graph.) Let Z denote the number of computed partitions. In order to estimate the best Z value of our test data, we run the following experiments:
@@ -139,17 +142,23 @@ The algorithm is highly dependent on the initial cut of the graph. To increase t
 
 Is seems that using the minimal T value of the random partition is not a good strategy. If anything, it leads a partition of lower quality. Let’s also consider the nature of the algorithm. By logging the reduction of T after each Q repeat, we can see that the biggest reduction of the T value lies at the first few steps:
 
+\begin{center}
 \begin{figure}[h]
-\includegraphics[width=200pt]{graph-cut3.png}
-\includegraphics[width=200pt]{graph-cut4.png}
+\includegraphics[width=300pt]{graph-cut3.png}
+
 \label{fig:g3}
 \end{figure}
-
+\begin{figure}[h]
+\includegraphics[width=300pt]{graph-cut4.png}
+\label{fig:g4}
+\end{figure}
+\end{center}
 As mentioned in the previous section, the task of computing the best possible swap is a \(O(n^2)\) procedure. It is currently the bottleneck of the computations. The gain from each swap is computed as shown in Lemma 1. Since no edges has negative weights, we know that \(-w(a,b)\) is 0 or negative. Therefore, the maximum gain possible by swapping two nodes is the sum of their d values. Let the nodes in each partition be sorted decreasingly by d, and lets compute the gain of each swap by going through the sorted nodes. If the maximum gain found is larger than the sum of d of the pair of nodes we are currently considering, then the computation can be stopped, since this pair and all the following pairs have a maximum possible gain lower than the maximum gain found. Notice, that we can no longer calculate the d values lazily, as the maximum d values must be found.
 
 The computational complexity of finding the best possible swap is still \(O(nˆ2)\), but the reduction in runtime is significant:
 
 \begin{center}
+\scalebox{0.9}{
 \begin{tabular}{| l | l | l | l | l | l |}
 \hline
 Number of edges & Number of nodes & Q & CPU time/sec & T before & T after
@@ -162,7 +171,7 @@ Number of edges & Number of nodes & Q & CPU time/sec & T before & T after
 215195 & 669 & 67 & 141.68 & 107387.44  & 103839.21\\
 unknown & 6040 & 604 & unknown & unknown & unknown \\
 \hline
-\end{tabular}
+\end{tabular}}
 \end{center}
 
 Notice that the algorithm only needs to calculate the gain from about 2-3 nodes from each array. The computational complexity of calculating the best swap is now in practice bound by the sorting.
