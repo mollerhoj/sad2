@@ -5,8 +5,6 @@ As described above, the MovieLens dataset contains a lot of individual user rati
 
 Next, we consider a problem about pairing up movie-buddies. Based on the user’s individual ratings of movies, we wish to to pair up users, who for the most part have similar opinions on the movies which they have both rated. We will consider an approximation algorithm using MapReduce with the assumption that a large amount of data is to be processed.
 \section{Average rating}
-\subsection{Problem description}
-The computation of average user ratings is in all its simplicity not a difficult algorithmic problem, but can, however, be addressed in several different ways. In the following we will discuss a naïve sequential approach, a streaming approach and a MapReduce approach and end up with a comparison and an assessment.
 
 \subsection{Problem description}
 The computation of average user ratings is in all its simplicity not a difficult algorithmic problem, but can, however, be addressed in several different ways. In the following we will discuss a naïve sequential approach, a streaming approach and a MapReduce approach and end up with a comparison and an assessment.
@@ -14,7 +12,6 @@ The computation of average user ratings is in all its simplicity not a difficult
 \subsection{Sequential approach}
 The sequential approach is straightforward and will serve as a base case. The basic idea is to sum up all the ratings for each movie and divide by the number of ratings.
 
-%\[average = sum\_1\_to\_n( r1, ..., rn ) / n\]
 \[average = \frac{1}{n}\sum\limits_{i=1}^n r_i\]
 
 \noindent This can be done in \(O(n)\) time and \(O(n)\) space. 
@@ -55,7 +52,6 @@ As mentioned in the introduction to this part, we want to find a way to pair up 
 
 The graph we constructed for this problem has users as vertices. A pair of vertices are connected with an undirected edge if the two users have rated one or more of the same movies. Additionally, each edge will be assigned a weight defined as the total difference in the score of the ratings divided by the number of movies that have been rated by both users. We will use this weight as a measure of how similar the movie taste of the two users is
 
-%\[weight = sum\_1\_to\_n(5 - | r^i_1 - r^i_2 | ) / n\]
 \[weight = \frac{1}{n}\sum\limits_{i=1}^n 5 - | r^i_1 - r^i_2 |\]
 
 where \(n\) is the number of movies rated by both users, and \(r^i_1\) and \(r^i_2\) are the individual ratings given by the two users on the same movie, denoted with the number \(i\). 
@@ -93,10 +89,10 @@ Figure \ref{fig:edge_figure} gives an example of the process of the algorithm. T
 \label{fig:edge_figure}
 \end{figure}
 
-\subsection{Running time}
+\subsubsection{Running time}
 The running time of the algorithm is linear and thus it is ideal to use on large datasets. Proofing the running time of the algorithm is quite simple as every iteration of the while loop removes at least one edge and thus the total amount of iterations and removed edges cannot exceed \(O(|E|)\).
 
-\subsection{Advantages and disadvantages}
+\subsubsection{Advantages and disadvantages}
 This algorithm does not find an optimal MWM, but guarantees to find a matching that contains at least half the weight of an optimal solution. The formal proof of the approximation can be found in chapter 3 in \cite{robert}.
 
 It is not possible to apply parallel computation on the algorithm as the process of the algorithm is based on two recursive calls (on a and b) which then would not know if the other recursive call had already processed a given edge. It would result in a collision between the edges matched in the recursive calls.
@@ -117,7 +113,7 @@ We claim that the algorithm returns a maximal matching. For the sake of contradi
 
 Now we show that the algorithm can be implemented in three MapReduce rounds with high probability when \(s=n^{1+2c/3}\) and at most \(O(\log n)\) rounds. In \cite{filtering} it is shown that the algorithm runs for one iteration with high probability when \(s=n^{1+2c/3}\) and \(O(\log n)\) rounds otherwise. Therefore it only remains to describe how to compute \(G'\), the filtered subgraph with the edges not in conflict with the initial matching. Denote by \(S_i\), a subset of \(E\), the edges incident on node \(i\), and let \(f_i\) be a function that drops an edge if it is matched and keeps it otherwise. The collection of functions \(f_i\) can be parallelized and computed in one MapReduce round. This is drawn from Lemma 6.1 in \cite{model}, which presents a model for computation in MapReduce. 
 
-\subsection{Maximum weighted matching}
+\subsubsection{Maximum weighted matching}
 We now consider the algorithm for computing an 8-approximation of the weighted maximum matching problem \cite{filtering}. The input to this algorithm is a simple graph, \(G=(V,E)\), and a weight function \(w : E \to R\). Denote by \(W\) the maximum weight.
 
 The Algorithm operates as follows: Split \(G\) into \(G_1,G_2, ...  ,G_{\lceil\log W\rceil}\), where \(G_i\) is the graph on the set \(V\) of vertices and the subset of edges in \(E\) with weights from \(2^{i-1}\) to \(2^{i}\). For \(1 \leq i \leq \lceil\log W\rceil\) run the maximal matching algorithm described above on \(G_i\) and let \(M_i\) be the matching for \(G_i\). Now consider the matchings in descending order from M\(_{\lceil\log W\rceil}\) to \(M_1\). When considering an edge \(e\) in \(M_i\), we add it to the final matching \(M\) if \(M \cup \{e\}\) is a valid matching, \emph{i.e} if \(e\) is not in conflict with any other edge already in \(M\). After all edges are considered, return \(M\).

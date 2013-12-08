@@ -7,21 +7,22 @@ In the first part of this project, we considered algorithms for pairing up users
 
 The users have rated the movies with a number from 1 to 5. We can build a graph where users having the same taste in movies are strongly connected, by computing weighted edges between the users, as in part 1.
 
-\[weight = sum\_1\_to\_n(5 - | r^i_1 - r^i_2 | ) / n\]
+\[weight = \frac{1}{n}\sum\limits_{i=1}^n 5 - | r^i_1 - r^i_2 |\]
 
 where \(n\) is the number of movies rated by both users, and \(r_i^1\) and
 \(r_i^2\) are the individual ratings given by the two users on the same movie,
 denoted with the number i. 
 
-We are looking for a solution where users are split into disconnected equally sized groups. Let T denote the sum of weights between the disconnected groups. Now, T is the value we are trying to minimize. Thus the partition we a looking for is not necessarily one where users with the same type have rated the same movies. As an example, consider the following graph:
+We are looking for a solution where users are split into disconnected equally sized groups. Let T denote the sum of weights between the disconnected groups. Now, T is the value we are trying to minimize. Thus the partition we a looking for is not necessarily one where users with the same type have rated the same movies. As an example, consider the graph in figure \ref{fig:g1}.
 
 \begin{figure}[h]
 \includegraphics[width=300pt]{graph-cut.png}
 \label{fig:g1}
+\caption{}
 \end{figure}
 
 If we are to partition the graph into 2 equal sized sets, the intuitive solution might be to cut the graph in the middle, resulting in a T value of 4. While cutting the edges a-b and c-d instead, the value of T can be reduced 3.
-
+Thus, with graphs such as this one, we will end up with a group of strongly connected users, and one of outsiders.
 \section{Number of possible answers}
 Lets consider the number of possible solutions to such a problem. We start by dividing n nodes into k subsets of size p. Picking the subsets one by one, our first pick is one out of (n p) possible first subsets. The second pick has ((n-p) * p) possible subsets, the third ((n-2*p) * p) possible subsets and so on. Since this must be done n/p = k times, and since the ordering of the subsets does not matter, the amount of possible solutions is:
 
@@ -49,7 +50,7 @@ A number which becomes extremely large even for small sets of data. Finding a so
 \section{Different algorithms}
 Practical solutions to graph partitioning problems are based on heuristics. The algorithms either use heuristics that rely on the properties of the graph as a whole, or rely on local searches. These are known as global and local heuristics.
 
-Global heuristics typically uses analysis of the adjacency matrix to determine the partitions[ref: balanced graph partitioning p2]. Local strategies uses an arbitrary initial partition of the graph, which has major impact on the final outcome. A good property of the local algorithms is that they can be applied after a global algorithm, in order to improve the quality of the partition.
+Global heuristics typically uses analysis of the adjacency matrix to determine the partitions\cite{balanced}. Local strategies uses an arbitrary initial partition of the graph, which has major impact on the final outcome. A good property of the local algorithms is that they can be applied after a global algorithm, in order to improve the quality of the partition.
 
 In this project we will implement an algorithm that uses local heuristics. 
 \section{The Lin-Kernighan algorithm}
@@ -109,9 +110,7 @@ unknown & 6040 & 604 & unknown & unknown & unknown \\
 \end{tabular}
 \end{center}
 
-The seed to the random partition has been the same in every example. Only the time it takes the run the algorithm has been measured (Not the parse time). The time and T values are the average of 10 runs.
-
-As the test data shows, the implementation is too slow to compute large dataset within a reasonable time. In order to improve execution speed, we used the profiler ruby-prof\cite{rubyprof} to find bottlenecks. We have introduced the following optimisations:
+The seed to the random partition has been the same in every example. Only the time it takes the run the algorithm has been measured (Not the time used to parse the data). The time and T values are the average of 10 runs. A 2.4 Gz i5 core MacBook Pro was used as test machine. As the test data shows, the implementation is too slow to compute large dataset within a reasonable time. In order to improve execution speed, we used the profiler ruby-prof\cite{rubyprof} to find bottlenecks. We have introduced the following optimisations:
 \begin{enumerate}
 \item Nodes caches a list of their neighbours, and the edges leading to neighbours.
 \item A hash of edges that can be looked up by node ids.
@@ -166,7 +165,7 @@ unknown & 6040 & 604 & unknown & unknown & unknown \\
 \end{tabular}
 \end{center}
 
-Notice that the algoritm only needs to calculate the gain from about 2-3 nodes from each array. The computational complexity of calculating the best swap is now in practice bound by the sorting.
+Notice that the algorithm only needs to calculate the gain from about 2-3 nodes from each array. The computational complexity of calculating the best swap is now in practice bound by the sorting.
 
 Even after the optimizations, the implementation cannot compute the data within a reasonable amount of time. We shall return to a discussion of this problem, for now, lets consider our options for producing a k-way partition:
 
@@ -180,19 +179,22 @@ To make the algorithm find multiple partitions, we apply it multiple times. The 
 
 A) A random partition is found, B) The algorithm is run. C) Random partitions are found on each partition. D) The algorithm is run on each partition. E) The partitions are merged. F) The algorithm is run (without a random partition). Now, the T value is calculated for the result in B and F. The result with the lowest T value is chosen as the partition. This strategy will improve the outcome of the algorithm, but increase the run time.
 
-\section{Limitations}
+\section{Retrospect}
 
-TODO: Refer to optimized algorithm The algorithm does not work with weighted
-nodes. This is not a problem, as our graph has unweighted nodes. The algorithm
-works on already partitioned graphs, and can therefore be used to improve
-the solutions found by other algorithms.Running times: The test data is a
-dense graph! Analysis, Can it be used in real world examples? Which graphs
-are hard to compute, which are easy?
+During the implementation of the Lin-Kernighan algorithm, we have realized a number of things that we would have liked to do differently. The Lin-Kernighan algorithm is not efficient enough to process such a big dataset. The strength of the algorithm is not the first partition of the graph. Rather, since the algorithm works on already partitioned graphs, it should be used to improve the solutions found by other algorithms. See \cite{schulz} for an example. The Lin-Kernighan algorithm works as  a basecase for other local heuristic
+methods. In \cite{dutt}, it is shown the that the time complexity can be
+reduced to  \(O(max(d|E|, |E| log |N|))  \)\footnote{d is the maximum number of outgoing edges from any node}, by only swapping neighboring nodes.
+In order process such a large amount of data, algorithms depending on global heuristics would be a better choice.\cite{naor} 
 
+The Ruby language is not very suitable for algorithms requiring large amounts of computations. It is difficult to reason about the time complexity of the methods of the datastructures in the standard library. A better choice would have been a language such as C or C++.
 \section{Conclusion}
 Throughout the project we have studied a range of algorithmic problems related to movie ratings in the MovieLens dataset. In the first part of the report we have covered different techniques for calculating average ratings. While not algorithmic difficult, this allowed us to discuss different approaches of streaming and MapReduce with a simple example. Next we considered ways to find movie buddies by applying algorithms for finding approximate maximum weighted matchings in a dense graph. First a ½-approximation sequential approach, which was implemented, and then we discussed an 8-approximation MapReduce approach for graphs too big to fit in memory on a single machine exploiting a technique called filtering. 
 
-In the second part...
+In the second part of the project, we have introduced the field of graph partitioning. We have seen how simple data such as the user ratings can yield complex algorithmic problems. We have implemented a heuristic graph algorithm, and discussed its inner workings. We have seen how statistical information can help optimize an algorithm for a particular dataset. We have also seen how a dataset can be so big that even an optimised algorithm is not efficient enough to process it. Finally, we have discussed  why a different type of algorithm might have been a more suitable choice.
+
+
+
+ 
 
 
 
