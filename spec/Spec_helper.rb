@@ -11,6 +11,7 @@ require 'Graph'
 require 'Node'
 require 'Edge'
 require 'LinKerlin'
+require 'RatingParser'
 
 require 'orm/Actor'
 require 'orm/Director'
