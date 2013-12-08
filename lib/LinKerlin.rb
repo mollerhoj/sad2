@@ -7,6 +7,14 @@ class LinKerlin
     @graph = graph
   end
 
+  def calculate_t
+    t = 0
+    graph.nodes.each do |n|
+      t += external_d n
+    end
+    t/2
+  end
+
   def random_partition
     graph.nodes.each do |node|
       if node.id%2 == 0
@@ -40,9 +48,9 @@ class LinKerlin
 
   def calculate
     random_partition
+    puts "before: #{calculate_t}"
     compute_ds
     while lin_kerlin_step
-      puts 'step'
       compute_ds
     end
   end

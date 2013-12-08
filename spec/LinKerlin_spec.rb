@@ -76,9 +76,9 @@ describe LinKerlin do
 
       lk2 = LinKerlin.new graph2
       lk2.N = 4
-      puts graph2
+      #puts graph2
       swaps = lk2.calculate
-      puts graph2
+      #puts graph2
     end
   end
 
@@ -328,4 +328,14 @@ describe LinKerlin do
       lk.compute_d(n7).should eq(2)
     end
   end
+
+  it "Should compute the t value of a graph" do
+    graph2 = Graph.new
+    graph2.b_nodes([0,:A],[1,:A],[2,:B],[3,:A],[4,:A])
+    graph2.b_edges([0,1, w:3], [1,2, w:1], [2,3, w:4], [3,4, w:8])
+    lk2 = LinKerlin.new graph2
+    lk2.calculate_t.should eq(5)
+  end
+
+
 end

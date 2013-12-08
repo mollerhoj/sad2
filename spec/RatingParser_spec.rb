@@ -53,7 +53,7 @@ describe RatingParser do
     lk = LinKerlin.new g
     lk.N = 3
     lk.calculate
-    puts g
+    puts "after: #{lk.calculate_t}"
   end
 
 end
