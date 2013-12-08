@@ -6,6 +6,9 @@ class LinKerlin
   def initialize graph=nil
     @graph = graph
     @bw = {}
+    @swaps_log = []
+    @gains_log = []
+    @sorted_head_log = []
   end
 
   def calculate_t
@@ -16,10 +19,9 @@ class LinKerlin
     t/2
   end
 
-  def random_partition
+  def random_partition (seed=nil)
     nodes_n = graph.nodes.size
     a_left = nodes_n / 2
-
     graph.nodes.each_with_index do |node,i|
       if rand(nodes_n-i) < a_left
         node.owner = :A
@@ -50,19 +52,24 @@ class LinKerlin
         swaps_n = i+1
       end
     end
+    @gains_log << gain_max.round(2)
     return swaps_n
   end
 
   def calculate
     while lin_kerlin_step
       compute_ds
-      puts 'step'
+
     end
+    puts @swaps_log.inspect
+    puts @gains_log.inspect
+    puts "av. ij " + (@sorted_head_log.inject(0.0) {|sum,e| sum+e} / @sorted_head_log.size).to_s
   end
 
   def lin_kerlin_step
     swaps = execute_N_best_swaps
     k = find_best_number_of_swaps swaps
+    @swaps_log << k
     if k > 0
       store_swaps swaps, k
       true
@@ -129,25 +136,45 @@ class LinKerlin
     swap.switch_owners
     recompute = [swap.a,swap.b] + swap.a.neighbors + swap.b.neighbors
     recompute.each do |node|
-      node.d = nil
+      node.d = compute_d node
     end
     swap
   end
 
   def best_swap
+    aa = graph.A_free.sort_by {|n| n.d}.reverse
+    bb = graph.B_free.sort_by {|n| n.d}.reverse
+    i = -1
+    j = -1
     best = nil
-    graph.A_free.each do |a|
-       graph.B_free.each do |b|
-         current = Swap.new([a,b])
-         current.gain = calc_gain a,b
-         if best.nil? or current.gain > best.gain
+    while(i < aa.size-2)
+      i+=1
+      for k in 0..j
+        current = Swap.new([aa[i],bb[k]])
+        current.gain = calc_gain aa[i],bb[k]
+        if best.nil? or current.gain > best.gain
            best = current
-         end
-       end
+        end
+      end
+      j+=1
+      for k in 0..i
+        current = Swap.new([aa[k],bb[j]])
+        current.gain = calc_gain aa[k],bb[j]
+        if best.nil? or current.gain > best.gain
+           best = current
+        end
+      end
+      if best.gain > aa[i].d + bb[j].d
+        @sorted_head_log << i
+        @sorted_head_log << j
+        break
+      end
     end
+
     if best.nil?
       puts "no free nodes"
     end
+
     return best
   end
 

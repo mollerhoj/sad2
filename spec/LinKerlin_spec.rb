@@ -127,7 +127,7 @@ describe LinKerlin do
       lk2.random_partition
       lk2.compute_ds
       swaps = lk2.calculate
-      #graph2
+      # puts graph2
     end
 
 

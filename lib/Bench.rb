@@ -9,20 +9,36 @@ rp = RatingParser.new
 g = nil
 
 puts Benchmark.measure {
-  g = rp.parse 'data/sample100000.dat'
+  g = rp.parse "data/sample#{ARGV[0].to_i}.dat"
 }
 
+puts "nodes#{g.nodes.size}, edges #{g.edges.size}"
+
 lk = LinKerlin.new g
-lk.N = 3
+lk.N = ARGV[1].to_i
+
+min_t = nil
+min_s = nil
+puts "Z: "
+puts Benchmark.measure {
+  ARGV[2].to_i.times do |i|
+    s = Random.new_seed
+    srand s
+    lk.random_partition
+    t = lk.calculate_t
+    if min_t.nil? or t < min_t
+      min_t = t
+      min_s = s
+    end
+  end
+}
+
+srand min_s
 lk.random_partition
 
-puts "compute_ds: " + Benchmark.measure {
-  26.times do
-    lk.compute_ds
-  end
-}.to_s
+lk.compute_ds
 
-puts Benchmark.measure {
+Benchmark.measure {
   puts "before: #{lk.calculate_t}"
 }
 
@@ -30,7 +46,7 @@ puts "calc time:" + Benchmark.measure {
   lk.calculate
 }.to_s
 
-puts Benchmark.measure {
+Benchmark.measure {
   puts "after: #{lk.calculate_t}"
 }
 
