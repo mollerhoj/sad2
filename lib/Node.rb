@@ -62,7 +62,7 @@ class Node
     if not owner
       "( #{@id.to_s})"
     else
-      "(#{@owner.to_s}#{@id.to_s})"
+      "(#{@owner.to_s}/#{@value.to_s}#{@id.to_s})"
     end
   end
   

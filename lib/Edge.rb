@@ -7,10 +7,12 @@ class Edge
   attr_accessor :pay
   attr_accessor :weight
 
-  def initialize(dest,weight=nil)
+  def initialize(dest,hash=nil)
     @from = dest[0]
     @to = dest[1]
-    @weight = weight
+    if not hash.nil?
+      @weight = hash[:weight]
+    end
   end
 
   def to_s

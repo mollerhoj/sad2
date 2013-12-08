@@ -17,6 +17,39 @@ class Graph
     edge
   end 
 
+  def build &block
+    self.instance_eval &block
+  end
+
+  #builds an edge
+  def build_edge(i,j,hash)
+    if nodes[i].nil?
+      nodes[i] = Node.new(i)
+    end
+    if nodes[j].nil?
+      nodes[j] = Node.new(j)
+    end
+    hash[:weight] = hash[:w]
+    add_edge Edge.new([nodes[i],nodes[j]],hash)
+  end
+
+  def b_edges *edges
+    edges.each do |e|
+      build_edge e[0],e[1],e[2]
+    end
+  end
+
+  def b_nodes *ns
+    ns.each do |n|
+      @nodes[n[0]] = Node.new(n[0])
+      @nodes[n[0]].owner = n[1]
+      @nodes[n[0]].value = n[1]
+      if not n[2].nil?
+        @nodes[n[0]].value = n[2]
+      end
+    end
+  end
+
   def A
     return @nodes.select {|n| n.owner == :A}
   end

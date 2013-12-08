@@ -6,7 +6,7 @@ describe Node do
 
     n0 = graph.add_node Node.new(0)
     n1 = graph.add_node Node.new(1)
-    graph.add_edge Edge.new([n0,n1],1)
+    graph.add_edge Edge.new([n0,n1],weight: 1)
 
     n0.neighbors.should eq([n1])
   end
@@ -36,14 +36,14 @@ describe Node do
       graph.add_node Node.new(1)
       graph.add_node Node.new(2)
       graph.add_node Node.new(3)
-      graph.add_edge Edge.new([n0,n1],3)
-      graph.add_edge Edge.new([n1,n2],1)
-      graph.add_edge Edge.new([n3,n1],6)
-      graph.add_edge Edge.new([n2,n3],7)
+      graph.add_edge Edge.new([n0,n1],weight: 3)
+      graph.add_edge Edge.new([n1,n2],weight: 1)
+      graph.add_edge Edge.new([n3,n1],weight: 6)
+      graph.add_edge Edge.new([n2,n3],weight: 7)
     end
 
     it "has neighbors" do
-      puts n1.neighbors.should eq([n2,n0,n3])
+      n1.neighbors.should eq([n2,n0,n3])
     end
 
     it "has out" do

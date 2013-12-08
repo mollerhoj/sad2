@@ -17,6 +17,7 @@ describe LinKerlin do
   #             8\  2\ 4|
   #               a-4-a/
   #              -4  -2
+
   before(:each) do
     graph.add_node Node.new(0)
     graph.add_node Node.new(1)
@@ -26,15 +27,100 @@ describe LinKerlin do
     graph.add_node Node.new(5)
     graph.add_node Node.new(6)
     graph.add_node Node.new(7)
-    graph.add_edge Edge.new([n0,n1],3)
-    graph.add_edge Edge.new([n2,n1],1)
-    graph.add_edge Edge.new([n2,n3],7)
-    graph.add_edge Edge.new([n3,n4],6)
-    graph.add_edge Edge.new([n4,n5],2)
-    graph.add_edge Edge.new([n3,n6],8)
-    graph.add_edge Edge.new([n7,n6],4)
-    graph.add_edge Edge.new([n7,n4],2)
-    graph.add_edge Edge.new([n7,n5],4)
+
+    graph.add_edge Edge.new([n0,n1],weight: 3)
+    graph.add_edge Edge.new([n2,n1],weight: 1)
+    graph.add_edge Edge.new([n2,n3],weight: 7)
+    graph.add_edge Edge.new([n3,n4],weight: 6)
+    graph.add_edge Edge.new([n4,n5],weight: 2)
+    graph.add_edge Edge.new([n3,n6],weight: 8)
+    graph.add_edge Edge.new([n7,n6],weight: 4)
+    graph.add_edge Edge.new([n7,n4],weight: 2)
+    graph.add_edge Edge.new([n7,n5],weight: 4)
+  end
+
+  context "build a graph" do
+    it "should build a simple graph" do
+      graph2 = Graph.new
+      graph2.b_nodes([0,:A],[1,:B],[2,:A],[3,:B],[4,:A])
+      graph2.b_edges([0,1, w:3], [1,2, w:1], [2,3, w:4], [2,4, w:8])
+      graph2.nodes.size.should eq(5)
+    end
+  end
+
+  context "calculate" do
+    it "should partition the graph" do
+      graph2 = Graph.new
+      graph2.b_edges([0,1, w:3], [2,1, w:1], [2,3, w:7], [3,4, w:6], [4,5, w:2],[3,6, w:8],[7,6, w:4],[7,4, w:2],[7,5, w: 4])
+      lk2 = LinKerlin.new graph2
+      lk2.N = 4
+      #puts graph2
+      swaps = lk2.calculate
+      #puts graph2
+    end
+
+    it "should partition the big graph" do
+      graph2 = Graph.new
+      graph2.b_edges(
+        [0,1, w:3],[1,2, w:3],[2,3, w:3],[3,4, w:3],
+        [5,6, w:3],[6,7, w:3],[7,8, w:3],[8,9, w:3],
+        [10,11, w:3],[11,12, w:3],[12,13, w:3],[13,14, w:3],
+        [15,16, w:3],[16,17, w:3],[17,18, w:3],[18,19, w:3],
+        [20,21, w:3],[21,22, w:3],[22,23, w:3],[23,24, w:3],
+        [0,5, w:3],[5,10, w:3],[10,15, w:3],[15,20, w:3],
+        [1,6, w:3],[6,11, w:3],[11,16, w:3],[16,21, w:3],
+        [2,7, w:3],[7,12, w:3],[12,17, w:3],[17,22, w:3],
+        [3,8, w:3],[8,13, w:3],[13,18, w:3],[18,23, w:3],
+        [4,9, w:3],[9,14, w:3],[14,19, w:3],[19,24, w:3]
+      )
+
+      lk2 = LinKerlin.new graph2
+      lk2.N = 4
+      puts graph2
+      swaps = lk2.calculate
+      puts graph2
+    end
+  end
+
+  context "linkerlin step" do
+    it "should store 1 swap" do
+      graph2 = Graph.new
+      graph2.b_nodes([0,:A],[1,:B],[2,:A],[3,:B],[4,:A],[5,:B],[6,:A],[7,:B])
+      graph2.b_edges([0,1, w:3], [2,1, w:1], [2,3, w:7], [3,4, w:6], [4,5, w:2],[3,6, w:8],[7,6, w:4],[7,4, w:2],[7,5, w: 4])
+
+      a = [-3,-2,-6,-5,-6,2,4,2]
+      graph2.nodes.each_with_index.map {|n,i| n.d = a[i]}
+
+      lk2 = LinKerlin.new graph2
+      lk2.N = 4
+      #puts graph2
+      swaps = lk2.lin_kerlin_step
+      #puts graph2
+    end
+
+    it "should take steps" do
+      graph2 = Graph.new
+      graph2.b_nodes([0,:A],[1,:A],[2,:A],[3,:A],[4,:B],[5,:B],[6,:B],[7,:B])
+      graph2.b_edges([0,1, w:2], [1,2, w:1], [2,3, w:2], [4,5, w:2], [5,6, w:1],
+                     [6,7, w:2], [0,4, w:2], [1,5, w:2], [2,6, w:2], [3,7, w:2])
+
+      a = [0,-1,-1,0,0,-1,-1,0]
+      graph2.nodes.each_with_index.map {|n,i| n.d = a[i]}
+
+      lk2 = LinKerlin.new graph2
+      lk2.N = 4
+      swaps = lk2.lin_kerlin_step
+
+      graph2.nodes[0].value.should eq(:B)
+      graph2.nodes[1].value.should eq(:B)
+      graph2.nodes[2].value.should eq(:A)
+      graph2.nodes[3].value.should eq(:A)
+      graph2.nodes[4].value.should eq(:B)
+      graph2.nodes[5].value.should eq(:B)
+      graph2.nodes[6].value.should eq(:A)
+      graph2.nodes[7].value.should eq(:A)
+    end
+
   end
 
   context "find best number of swaps" do
@@ -53,32 +139,56 @@ describe LinKerlin do
   end
 
   context "save swaps" do
-    it "should store 2 swap values" do
-      n0.owner = :A
-      n0.value = :B
-      n1.owner = :A
-      n1.value = :B
-      n2.owner = :B
-      n3.owner = :B
-      n4.owner = :B
-      n4.value = :B
-      n7.owner = :A
+    it "should store 3 swap values" do
+      graph2 = Graph.new
+      graph2.b_nodes([0,:A,:B],[1,:B,:A],[2,:B,:B],[3,:B,:B],[4,:B,:B],[5,:B],[6,:A],[7,:B])
+      graph2.b_edges([0,1, w:3], [2,1, w:1], [2,3, w:7], [3,4, w:6], [4,5, w:2],[3,6, w:8],[7,6, w:4],[7,4, w:2],[7,5, w: 4])
       swaps = []
-      swaps << Swap.new([n2,n1])
-      swaps << Swap.new([n0,n3])
-      swaps << Swap.new([n4,n7])
-      n0.value.should eq(:B)
-      n1.value.should eq(:B)
-      n4.value.should eq(:B)
-      lk.save_swaps(swaps,2)
-      n0.value.should eq(:A)
-      n1.value.should eq(:A)
-      n4.value.should eq(:B)
+      swaps << Swap.new([graph2.nodes[2],graph2.nodes[1]])
+      swaps << Swap.new([graph2.nodes[4],graph2.nodes[7]])
+      swaps << Swap.new([graph2.nodes[0],graph2.nodes[3]])
+      swaps << Swap.new([graph2.nodes[5],graph2.nodes[6]])
+      graph2.nodes[0].value.should eq(:B)
+      graph2.nodes[1].value.should eq(:A)
+      graph2.nodes[4].value.should eq(:B)
+      graph2.nodes[5].value.should eq(:B)
+      lk2 = LinKerlin.new graph2
+      lk2.save_swaps(swaps,3)
+      graph2.nodes[0].value.should eq(:A)
+      graph2.nodes[1].value.should eq(:B)
+      graph2.nodes[4].value.should eq(:B)
+      graph2.nodes[5].value.should eq(:B)
     end
   end
 
-  context "execute the best swap" do
-    it "should return the graph after best swap" do
+  context "execute the best swap(s)" do
+    it "should return a list of swaps" do
+      n0.owner = :A
+      n1.owner = :A
+      n2.owner = :B
+      n3.owner = :B
+      n4.owner = :B
+      n5.owner = :B
+      n6.owner = :A
+      n7.owner = :A
+      n0.d = -3
+      n1.d = -2
+      n2.d = -6
+      n3.d = -5
+      n4.d = -6
+      n5.d = 2
+      n6.d = 4
+      n7.d = 2
+      lk.N = 3
+      swaps = lk.execute_N_best_swaps
+      swaps[0].a.should eq(n6)
+      swaps[0].b.should eq(n5)
+      swaps[0].gain.should eq(6)
+      swaps[1].gain.should eq(-4)
+      swaps[2].gain.should eq(-5)
+    end
+
+    it "should swaps owners with highest gain" do
       n0.owner = :A
       n1.owner = :A
       n2.owner = :B
@@ -87,7 +197,7 @@ describe LinKerlin do
       n1.d = 2
       n2.d = 6
       n3.d = 7
-      graph_new = lk.execute_best_swap
+      lk.execute_best_swap
       n0.owner.should eq(:B)
       n3.owner.should eq(:A)
     end

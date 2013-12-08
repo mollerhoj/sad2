@@ -28,7 +28,6 @@ class LinKerlin
   #find max of sums.
   def find_best_number_of_swaps swaps
     swaps_n = gain_sum = gain_max = 0
-
     swaps.each_with_index do |swap,i|
       gain_sum+= swap.gain
       if gain_sum > gain_max
@@ -36,42 +35,55 @@ class LinKerlin
         swaps_n = i+1
       end
     end
-
     return swaps_n
   end
 
-  def lin_kerlin
-    #partition
-    #while lin_kerlin_step do end
+  def calculate
+    random_partition
+    compute_ds
+    while lin_kerlin_step
+      puts 'step'
+      compute_ds
+    end
   end
 
   def lin_kerlin_step
-    # swaps = []
-    # N.times do
-    #   swaps << execute_best_swap
-    # end
-    # k = find_best_number_of_swaps swaps
-    # if k > 0
-    #   save_swaps swaps k
-    #   clean_swaps swaps
-    #   true
-    # else
-    #   false
-    # end
+    swaps = execute_N_best_swaps
+    k = find_best_number_of_swaps swaps
+    if k > 0
+      store_swaps swaps, k
+      true
+    else
+      false
+    end
+  end
+
+  def execute_N_best_swaps
+    swaps = []
+    @N.times do
+      swaps << execute_best_swap
+    end
+    swaps
+  end
+
+  def store_swaps swaps, k
+    save_swaps swaps, k
+    clean_swaps swaps, k
   end
 
   def save_swaps swaps, k
-    #only to k!
-    swaps.each do |swap|
+    swaps[0,k].each do |swap|
       swap.values = swap.owners
     end
   end
 
-  def clean_swaps swaps
-    # swaps.each do |swap|
-    #   swap.switch_owners
-    #   swap.unmark
-    # end
+  def clean_swaps swaps, k
+    swaps.each do |swap|
+      swap.owners = swap.values
+    end
+    swaps.each do |swap|
+      swap.unmark
+    end
   end
 
   def execute_best_swap
@@ -86,6 +98,7 @@ class LinKerlin
     recompute.each do |node|
       compute_d node
     end
+    swap
   end
 
   def best_swap
@@ -98,6 +111,9 @@ class LinKerlin
            best = current
          end
        end
+    end
+    if best.nil?
+      puts "no free nodes"
     end
     return best
   end
@@ -150,6 +166,11 @@ class Swap
     @b.mark
   end
 
+  def unmark
+    @a.unmark
+    @b.unmark
+  end
+
   def switch_owners
     @a.owner, @b.owner = @b.owner, @a.owner
   end
@@ -157,6 +178,15 @@ class Swap
   def values=(v)
     @a.value=v[0]
     @b.value=v[1]
+  end
+
+  def owners=(o)
+    @a.owner=o[0]
+    @b.owner=o[1]
+  end
+
+  def values
+    [@a.value,@b.value]
   end
 
   def owners
@@ -168,31 +198,8 @@ class Swap
     @b = nodes[1]
     @gain = gain
   end
+
+  def to_s
+    "#{@a} <- #{@gain} -> #{@b}"
+  end
 end
-
-# A,B graph split
-# g: gain
-# g_max: maximal gain
-# N: number of swaps to do max=(|V|/2)
-
-# #it should return the graph after running the kernighan_lin algoritm
-# def kernighan_lin graph n
-#   if n.nil?
-#     n = graph.nodes_n/2
-#   end
-#   graph = random_partition graph
-#   graph.t = 0 #relative t value
-#   kernighan_lin_loop graph n
-# end
-# 
-# #helper
-# def kernighan_lin_loop graph n
-#   loop do
-#     new_graph = compute_swaps graph n
-#     if new_graph
-#       graph = new_graph
-#     else
-#       break
-#     end
-#   end
-# end
