@@ -11,6 +11,22 @@ describe Node do
     n0.neighbors.should eq([n1])
   end
 
+  it "has edges to other nodes" do
+    graph = Graph.new
+
+    n0 = graph.add_node Node.new(0)
+    n1 = graph.add_node Node.new(1)
+    n2 = graph.add_node Node.new(2)
+    e1 = Edge.new([n0,n1],weight: 3)
+    e2 = Edge.new([n1,n2],weight: 3)
+    graph.add_edge e1
+    graph.add_edge e2
+
+    n0.edges_to(n1).should eq([e1])
+    n0.edges_to(n2).should eq([])
+    n1.edges_to(n2).should eq([e2])
+  end
+
   it "can hold a d value" do
     n = Node.new(0)
     n.d = 7

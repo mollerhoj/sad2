@@ -13,6 +13,7 @@ class Node
     @in = []
     @out = []
     @free = true
+    @et = {}
   end
 
   def edges
@@ -20,7 +21,7 @@ class Node
   end
 
   def relations
-    relations_in + relations_out
+    @relations ||= relations_in + relations_out
   end
 
   def relations_out
@@ -56,6 +57,21 @@ class Node
       n << edge.from
     end
     n
+  end
+
+  def edges_to other
+    if !@et[other].nil?
+      @et[other]
+    else
+      @et[other] = edges_to_helper other
+    end
+  end
+
+  def edges_to_helper other
+    relations.inject([]) do |p,r|
+      p << r[1] if r[0] == other
+      p
+    end
   end
   
   def to_s

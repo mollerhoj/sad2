@@ -5,6 +5,7 @@ class LinKerlin
 
   def initialize graph=nil
     @graph = graph
+    @bw = {}
   end
 
   def calculate_t
@@ -16,9 +17,13 @@ class LinKerlin
   end
 
   def random_partition
-    graph.nodes.each do |node|
-      if node.id%2 == 0
+    nodes_n = graph.nodes.size
+    a_left = nodes_n / 2
+
+    graph.nodes.each_with_index do |node,i|
+      if rand(nodes_n-i) < a_left
         node.owner = node.value = :A
+        a_left -=1
       else
         node.owner = node.value = :B
       end
@@ -47,11 +52,9 @@ class LinKerlin
   end
 
   def calculate
-    random_partition
-    puts "before: #{calculate_t}"
-    compute_ds
     while lin_kerlin_step
       compute_ds
+      puts 'step'
     end
   end
 
@@ -104,7 +107,7 @@ class LinKerlin
     swap.switch_owners
     recompute = [swap.a,swap.b] + swap.a.neighbors + swap.b.neighbors
     recompute.each do |node|
-      compute_d node
+      node.d = nil
     end
     swap
   end
@@ -128,11 +131,18 @@ class LinKerlin
 
   # move to swap
   def calc_gain a,b
+    if a.d.nil?
+      compute_d a
+    end
+    if b.d.nil?
+      compute_d b
+    end
     a.d + b.d - 2*weight_between([a,b])
   end
 
   def weight_between nodes
-    graph.edges_between(nodes).inject(0) do |weight,edge|
+    @bw[nodes] ||=
+    nodes[0].edges_to(nodes[1]).inject(0) do |weight,edge| ####!
       weight += edge.weight
     end
   end
@@ -155,7 +165,7 @@ class LinKerlin
   def external_d source
     count = 0
     source.relations.each do |node,edge|
-      if node.owner != source.owner
+      if node.owner != source.owner ##!
         count += edge.weight
       end
     end

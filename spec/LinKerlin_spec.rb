@@ -54,9 +54,11 @@ describe LinKerlin do
       graph2.b_edges([0,1, w:3], [2,1, w:1], [2,3, w:7], [3,4, w:6], [4,5, w:2],[3,6, w:8],[7,6, w:4],[7,4, w:2],[7,5, w: 4])
       lk2 = LinKerlin.new graph2
       lk2.N = 4
-      #puts graph2
+      #graph2
+      lk2.random_partition
+      lk2.compute_ds
       swaps = lk2.calculate
-      #puts graph2
+      #graph2
     end
 
     it "should partition the big graph" do
@@ -76,9 +78,11 @@ describe LinKerlin do
 
       lk2 = LinKerlin.new graph2
       lk2.N = 4
-      #puts graph2
+      # graph2
+      lk2.random_partition
+      lk2.compute_ds
       swaps = lk2.calculate
-      #puts graph2
+      #graph2
     end
   end
 
@@ -93,9 +97,9 @@ describe LinKerlin do
 
       lk2 = LinKerlin.new graph2
       lk2.N = 4
-      #puts graph2
+      #graph2
       swaps = lk2.lin_kerlin_step
-      #puts graph2
+      #graph2
     end
 
     it "should take steps" do
@@ -288,15 +292,15 @@ describe LinKerlin do
       n0.free?.should eq(false)
     end
 
-    it "d values should be recomputed" do
+    it "d values should set to nil" do
       lk.compute_d n1
       lk.compute_d n2
       lk.compute_d n3
       lk.execute_swap swap
-      n0.d.should eq(3)
-      n1.d.should eq(2)
-      n2.d.should eq(6)
-      n3.d.should eq(9)
+      n0.d.should eq(nil)
+      n1.d.should eq(nil)
+      n2.d.should eq(nil)
+      n3.d.should eq(nil)
     end
   end
 
@@ -336,6 +340,5 @@ describe LinKerlin do
     lk2 = LinKerlin.new graph2
     lk2.calculate_t.should eq(5)
   end
-
 
 end

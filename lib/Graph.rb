@@ -1,6 +1,3 @@
-require "Node"
-require "Edge" 
-
 class Graph
 
   attr_accessor :nodes

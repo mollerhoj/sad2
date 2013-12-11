@@ -1,4 +1,5 @@
 require 'Spec_helper'
+require 'benchmark'
 
 describe RatingParser do
 
@@ -48,12 +49,28 @@ describe RatingParser do
   end
 
   ## functional tests
-  it "should create a graph", :focus do
-    g = rp.parse 'data/sample20000.dat'
-    lk = LinKerlin.new g
-    lk.N = 3
-    lk.calculate
-    puts "after: #{lk.calculate_t}"
+  it "should create a graph" do
+      g = nil
+
+      g = rp.parse 'data/sample100000.dat'
+
+      lk = LinKerlin.new g
+      lk.N = 1
+
+      10.times do
+        lk.random_partition
+        puts "try: #{lk.calculate_t}"
+        puts "#{g.A.size}/#{g.B.size}"
+      end
+
+      # lk.compute_ds
+
+      # puts "before: #{lk.calculate_t}"
+
+      # #lk.calculate
+
+      # puts "after: #{lk.calculate_t}"
+
   end
 
 end
