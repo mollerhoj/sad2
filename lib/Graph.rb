@@ -40,7 +40,15 @@ class Graph
     ns.each do |n|
       @nodes[n[0]] = Node.new(n[0])
       @nodes[n[0]].owner = n[1]
-      @nodes[n[0]].value = n[1]
+
+      if @nodes[n[0]].owner == :A
+        @nodes[n[0]].value = 0
+      end
+
+      if @nodes[n[0]].owner == :B
+        @nodes[n[0]].value = 1
+      end
+
       if not n[2].nil?
         @nodes[n[0]].value = n[2]
       end
@@ -56,11 +64,11 @@ class Graph
   end
 
   def X
-    return @nodes.select {|n| n.value == :A}
+    return @nodes.select {|n| n.value == 0}
   end
 
   def Y
-    return @nodes.select {|n| n.value == :B}
+    return @nodes.select {|n| n.value == 1}
   end
 
   def edges_between nodes

@@ -22,10 +22,12 @@ class LinKerlin
 
     graph.nodes.each_with_index do |node,i|
       if rand(nodes_n-i) < a_left
-        node.owner = node.value = :A
+        node.owner = :A
+        node.value = 0
         a_left -=1
       else
-        node.owner = node.value = :B
+        node.owner = :B
+        node.value = 1
       end
     end
     graph
@@ -84,13 +86,33 @@ class LinKerlin
 
   def save_swaps swaps, k
     swaps[0,k].each do |swap|
-      swap.values = swap.owners
+      ## depending on round
+      if swap.a.owner == :A
+        swap.a.value = 0
+      else
+        swap.a.value = 1
+      end
+      if swap.b.owner == :A
+        swap.b.value = 0
+      else
+        swap.b.value = 1
+      end
     end
   end
 
   def clean_swaps swaps, k
     swaps.each do |swap|
-      swap.owners = swap.values
+      ## depending on round
+      if swap.a.value == 0
+        swap.a.owner = :A
+      else
+        swap.a.owner = :B
+      end
+      if swap.b.value == 0
+        swap.b.owner = :A
+      else
+        swap.b.owner = :B
+      end
     end
     swaps.each do |swap|
       swap.unmark

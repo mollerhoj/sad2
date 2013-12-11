@@ -84,6 +84,53 @@ describe LinKerlin do
       swaps = lk2.calculate
       #graph2
     end
+
+    # -1
+    # 00 0
+    # 01 1
+    # 10 2
+    # 11 3
+    #
+    # 2^round
+    #
+    #        +0,+4
+    #        000 0
+    #   0,2  100 4
+    #   00 0 010 2
+    # 0 10 2 110 6
+    #
+    # 1 11 3 001 1
+    #   01 1 101 5
+    #        011 3
+    #        111 7
+    #
+    
+
+    it "should 4-way partition the big graph" do
+      graph2 = Graph.new
+      graph2.b_edges(
+        [0,1, w:3],[1,2, w:3],[2,3, w:3],[3,4, w:3],
+        [5,6, w:3],[6,7, w:3],[7,8, w:3],[8,9, w:3],
+        [10,11, w:3],[11,12, w:3],[12,13, w:3],[13,14, w:3],
+        [15,16, w:3],[16,17, w:3],[17,18, w:3],[18,19, w:3],
+        [20,21, w:3],[21,22, w:3],[22,23, w:3],[23,24, w:3],
+        [0,5, w:3],[5,10, w:3],[10,15, w:3],[15,20, w:3],
+        [1,6, w:3],[6,11, w:3],[11,16, w:3],[16,21, w:3],
+        [2,7, w:3],[7,12, w:3],[12,17, w:3],[17,22, w:3],
+        [3,8, w:3],[8,13, w:3],[13,18, w:3],[18,23, w:3],
+        [4,9, w:3],[9,14, w:3],[14,19, w:3],[19,24, w:3]
+      )
+
+      lk2 = LinKerlin.new graph2
+      lk2.N = 4
+      # graph2
+      lk2.random_partition
+      lk2.compute_ds
+      swaps = lk2.calculate
+      #graph2
+    end
+
+
   end
 
   context "linkerlin step" do
@@ -115,14 +162,14 @@ describe LinKerlin do
       lk2.N = 4
       swaps = lk2.lin_kerlin_step
 
-      graph2.nodes[0].value.should eq(:B)
-      graph2.nodes[1].value.should eq(:B)
-      graph2.nodes[2].value.should eq(:A)
-      graph2.nodes[3].value.should eq(:A)
-      graph2.nodes[4].value.should eq(:B)
-      graph2.nodes[5].value.should eq(:B)
-      graph2.nodes[6].value.should eq(:A)
-      graph2.nodes[7].value.should eq(:A)
+      graph2.nodes[0].value.should eq(1)
+      graph2.nodes[1].value.should eq(1)
+      graph2.nodes[2].value.should eq(0)
+      graph2.nodes[3].value.should eq(0)
+      graph2.nodes[4].value.should eq(1)
+      graph2.nodes[5].value.should eq(1)
+      graph2.nodes[6].value.should eq(0)
+      graph2.nodes[7].value.should eq(0)
     end
 
   end
@@ -145,23 +192,23 @@ describe LinKerlin do
   context "save swaps" do
     it "should store 3 swap values" do
       graph2 = Graph.new
-      graph2.b_nodes([0,:A,:B],[1,:B,:A],[2,:B,:B],[3,:B,:B],[4,:B,:B],[5,:B],[6,:A],[7,:B])
+      graph2.b_nodes([0,:A,1],[1,:B,0],[2,:B,1],[3,:B,1],[4,:B,1],[5,:B],[6,:A],[7,:B])
       graph2.b_edges([0,1, w:3], [2,1, w:1], [2,3, w:7], [3,4, w:6], [4,5, w:2],[3,6, w:8],[7,6, w:4],[7,4, w:2],[7,5, w: 4])
       swaps = []
       swaps << Swap.new([graph2.nodes[2],graph2.nodes[1]])
       swaps << Swap.new([graph2.nodes[4],graph2.nodes[7]])
       swaps << Swap.new([graph2.nodes[0],graph2.nodes[3]])
       swaps << Swap.new([graph2.nodes[5],graph2.nodes[6]])
-      graph2.nodes[0].value.should eq(:B)
-      graph2.nodes[1].value.should eq(:A)
-      graph2.nodes[4].value.should eq(:B)
-      graph2.nodes[5].value.should eq(:B)
+      graph2.nodes[0].value.should eq(1)
+      graph2.nodes[1].value.should eq(0)
+      graph2.nodes[4].value.should eq(1)
+      graph2.nodes[5].value.should eq(1)
       lk2 = LinKerlin.new graph2
       lk2.save_swaps(swaps,3)
-      graph2.nodes[0].value.should eq(:A)
-      graph2.nodes[1].value.should eq(:B)
-      graph2.nodes[4].value.should eq(:B)
-      graph2.nodes[5].value.should eq(:B)
+      graph2.nodes[0].value.should eq(0)
+      graph2.nodes[1].value.should eq(1)
+      graph2.nodes[4].value.should eq(1)
+      graph2.nodes[5].value.should eq(1)
     end
   end
 
@@ -316,8 +363,8 @@ describe LinKerlin do
     end
   end
 
-  context "The d value for a node" do
-    it "Should compute the value of d for the node" do
+  context "The d for a node" do
+    it "Should compute the d for the node" do
       n0.owner,n1.owner = :A,:A
       n2.owner,n3.owner = :B,:B
       n4.owner,n5.owner = :B,:B
@@ -333,7 +380,7 @@ describe LinKerlin do
     end
   end
 
-  it "Should compute the t value of a graph" do
+  it "Should compute the t of a graph" do
     graph2 = Graph.new
     graph2.b_nodes([0,:A],[1,:A],[2,:B],[3,:A],[4,:A])
     graph2.b_edges([0,1, w:3], [1,2, w:1], [2,3, w:4], [3,4, w:8])
