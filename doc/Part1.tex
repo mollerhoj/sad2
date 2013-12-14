@@ -14,9 +14,11 @@ The computation of average user ratings is in all its simplicity not a difficult
 \subsection{Sequential approach}
 The sequential approach is straightforward and will serve as a base case. The basic idea is to sum up all the ratings for each movie and divide by the number of ratings.
 
-\[average = sum\_1\_to\_n( r1, ..., rn ) / n\]
+%\[average = sum\_1\_to\_n( r1, ..., rn ) / n\]
+\[average = \frac{1}{n}\sum\limits_{i=1}^n r_i\]
 
-This can be done in \(O(n)\) time and \(O(n)\) space. 
+\noindent This can be done in \(O(n)\) time and \(O(n)\) space. 
+
 \subsection{Streaming approach}
 If the amount of data is huge and user ratings keep coming in, the sequential algorithm might not be a viable approach. Instead, one could consider a simple streaming algorithm for computing the average movie ratings. 
 
@@ -45,7 +47,7 @@ Number of rounds:&               \(O(1)\)\\
 \end{center}
 
 \subsection{Implementation}
-We have implemented all three approaches of computing the average ratings in Java for demonstration. The sequential and streaming approaches are rather straight forward. Applying the MapReduce approach was a bit of a struggle as it took some time setting up Hadoop,, but the algorithm itself is pretty simple. The code can be found on the enclosed CD.
+We have implemented all three approaches of computing the average ratings in Java for demonstration. The sequential and streaming approaches are rather straight forward. Applying the MapReduce approach was a bit of a struggle as it took some time setting up Hadoop, but the algorithm itself is pretty simple. The code can be found on the enclosed CD.
 
 \section{Movie buddies}
 \subsection{Problem description}
@@ -53,11 +55,12 @@ As mentioned in the introduction to this part, we want to find a way to pair up 
 
 The graph we constructed for this problem has users as vertices. A pair of vertices are connected with an undirected edge if the two users have rated one or more of the same movies. Additionally, each edge will be assigned a weight defined as the total difference in the score of the ratings divided by the number of movies that have been rated by both users. We will use this weight as a measure of how similar the movie taste of the two users is
 
-\[weight = sum\_1\_to\_n(5 - | r^i_1 - r^i_2 | ) / n\]
+%\[weight = sum\_1\_to\_n(5 - | r^i_1 - r^i_2 | ) / n\]
+\[weight = \frac{1}{n}\sum\limits_{i=1}^n 5 - | r^i_1 - r^i_2 |\]
 
-where \(n\) is the number of movies rated by both users, and \(r_i^1\) and \(r_i^2\) are the individual ratings given by the two users on the same movie, denoted with the number i. 
+where \(n\) is the number of movies rated by both users, and \(r^i_1\) and \(r^i_2\) are the individual ratings given by the two users on the same movie, denoted with the number \(i\). 
 
-This is can be categorized as a maximum weighted matching problem. A matching is defined as a set of edges without common vertices. A \emph{maximum matching} is a matching containing the largest possible number of edges and a \emph{maximal matching} is a matching M with the property that if any edge is added to M it is no longer a valid matching. In a \emph{maximum weighted matching}, we want to maximize the sum of the weights of the matched edges.
+This is can be categorized as a maximum weighted matching problem. A matching is defined as a set of edges without common vertices. A \emph{maximum matching} is a matching containing the largest possible number of edges and a \emph{maximal matching} is a matching \(M\) with the property that if any edge is added to \(M\) it is no longer a valid matching. In a \emph{maximum weighted matching}, we want to maximize the sum of the weights of the matched edges.
 
 In the following we describe two different approaches to solving this problem. First a sequential approach and then we discuss how the problem may be solved in a parallel, distributed way, assuming the graph is very large.
 
@@ -80,9 +83,9 @@ remove all edges incident to a or b from E;
 ENDWHILE
 \end{lstlisting}
 
-The algorithm starts with an empty matching \(M_{LAM}\) in which the edges recursively will be added during the execution and a set \(E\) containing all the edges between the vertices in the graph. It initiates by choosing an arbitrary edge \(e=\{a,b\}\) from E and starts checking if any of the adjacent edges to the two vertices a and b have a higher weight than e. If such an edge is found it proceeds to that edge and applies the procedure. It continues until an edge is found where no adjacent edges have a higher weight than the current one. When the edge with the locally highest weight is found, it is added to \(M_{LAM}\) and all edges incident to the two vertices of the edge are removed from \(E\). The algorithm terminates when \(E\) is empty.
+The algorithm starts with an empty matching \(M_{LAM}\) in which the edges recursively will be added during the execution and a set \(E\) containing all the edges between the vertices in the graph. It initiates by choosing an arbitrary edge \(e=\{a,b\}\) from \(E\) and starts checking if any of the adjacent edges to the two vertices \(a\) and \(b\) have a higher weight than \(e\). If such an edge is found it proceeds to that edge and applies the procedure. It continues until an edge is found where no adjacent edges have a higher weight than the current one. When the edge with the locally highest weight is found, it is added to \(M_{LAM}\) and all edges incident to the two vertices of the edge are removed from \(E\). The algorithm terminates when \(E\) is empty.
 
-Figure \ref{fig:edge_figure} gives an example of the process of the algorithm. The algorithm has traversed through edge 1 and 2 and is currently at edge 3. It applies that \(edge 1 < edge 2 < edge 3.\) It checks if the edges incident to a and b are of higher weight than {a,b} and adds it to \(M_{LAM}\). Thus, the edges \({a,c_{1,2,3}} < {a,b}\) and \({b, d_{1,2}} < {a,b}\).
+Figure \ref{fig:edge_figure} gives an example of the process of the algorithm. The algorithm has traversed through edge 1 and 2 and is currently at edge 3. It applies that \(edge 1 < edge 2 < edge 3.\) It checks if the edges incident to \(a\) and \(b\) are of higher weight than \(\{a,b\}\) and adds it to \(M_{LAM}\). Thus, the edges \(\{a,c_{1,2,3}\} < \{a,b\}\) and \(\{b, d_{1,2}\} < \{a,b\}\).
 
 \begin{figure}[h]
   \includegraphics[width=300pt]{edge_figure.png}
@@ -105,25 +108,25 @@ The graph we are considering may potentially be too large to be kept in memory a
 
 We will start out by presenting an algorithm to compute an unweighted maximal matching and thus a 2-approximation to the unweighted maximum matching problem. Then we will extend this technique to obtain an 8-approximation algorithm to the maximum weighted matching problem\cite{filtering}. Please note that some details have been left out for the sake of simplicity.
 
-Let \(G=(V,E)\) be an undirected graph, where \(n=|V|\) and \(m=|E|\). We will call G c-dense if \(m=n^{1+c}\), where \(0<c<=1\). We assume the machines we are working with have a limited memory of size s. 
+Let \(G=(V,E)\) be an undirected graph, where \(n=|V|\) and \(m=|E|\). We will call \(G\) \(c\)-dense if \(m=n^{1+c}\), where \(0<c\le1\). We assume the machines we are working with have a limited memory of size \(s\). 
 
 \subsubsection{Unweighted maximal matching}
-First we consider an algorithm for solving an unweighted maximal matching problem on a large graph, G. The algorithm operates by first sampling \(O(s)\) edges from G and finding a maximal matching M’ in the resulting subgraph and then augmenting the final matching M with M’. Given M, we can now safely remove edges from G that are in conflict with M. If the resulting filtered graph, G’, can fit in memory on a single machine, the algorithm augments M with a matching found on G’ and returns the final matching, M. Otherwise, we augment M by recursing on G’. Please refer to \cite{filtering} for the formal description of the algorithm.
+First we consider an algorithm for solving an unweighted maximal matching problem on a large graph, \(G\). The algorithm operates by first sampling \(O(s)\) edges from \(G\) and finding a maximal matching \(M'\) in the resulting subgraph and then augmenting the final matching \(M\) with \(M'\). Given \(M\), we can now safely remove edges from \(G\) that are in conflict with \(M\). If the resulting filtered graph, \(G'\), can fit in memory on a single machine, the algorithm augments \(M\) with a matching found on \(G'\) and returns the final matching, \(M\). Otherwise, we augment \(M\) by recursing on \(G'\). Please refer to \cite{filtering} for the formal description of the algorithm.
 
-We claim that the algorithm returns a maximal matching. For the sake of contradiction, consider an edge (u,v) in E such that neither u nor v are matched in M. In the last iteration of the algorithm, a maximal matching, M’, is found on the set of edges that are not in conflict with M, and M is augmented with M’. Since M’ is a maximal matching, either u, v or both must be in M’ and therefore in the final matching M. This gives us our contradiction and therefore the final matching M is a maximal matching on G.
+We claim that the algorithm returns a maximal matching. For the sake of contradiction, consider an edge \((u,v)\) in E such that neither \(u\) nor \(v\) are matched in \(M\). In the last iteration of the algorithm, a maximal matching, \(M'\), is found on the set of edges that are not in conflict with \(M\), and \(M\) is augmented with \(M'\). Since \(M'\) is a maximal matching, either \(u\), \(v\) or both must be in \(M'\) and therefore in the final matching \(M\). This gives us our contradiction and therefore the final matching \(M\) is a maximal matching on \(G\).
 
-Now we show that the algorithm can be implemented in three MapReduce rounds with high probability when \(s=n^{1+2c/3}\) and at most O(log n) rounds. In \cite{filtering} it is shown that the algorithm runs for one iteration with high probability when \(s=n^{1+2c/3}\) and O(log n) rounds otherwise. Therefore it only remains to describe how to compute G’, the filtered subgraph with the edges not in conflict with the initial matching. Denote by \(S_i\), a subset of E, the edges incident on node i, and let \(f_i\) be a function that drops an edge if it is matched and keeps it otherwise. The collection of functions \(f_i\) can be parallelized and computed in one MapReduce round. This is drawn from Lemma 6.1 in \cite{model}, which presents a model for computation in MapReduce. 
+Now we show that the algorithm can be implemented in three MapReduce rounds with high probability when \(s=n^{1+2c/3}\) and at most \(O(\log n)\) rounds. In \cite{filtering} it is shown that the algorithm runs for one iteration with high probability when \(s=n^{1+2c/3}\) and \(O(\log n)\) rounds otherwise. Therefore it only remains to describe how to compute \(G'\), the filtered subgraph with the edges not in conflict with the initial matching. Denote by \(S_i\), a subset of \(E\), the edges incident on node \(i\), and let \(f_i\) be a function that drops an edge if it is matched and keeps it otherwise. The collection of functions \(f_i\) can be parallelized and computed in one MapReduce round. This is drawn from Lemma 6.1 in \cite{model}, which presents a model for computation in MapReduce. 
 
 \subsection{Maximum weighted matching}
-We now consider the algorithm for computing an 8-approximation of the weighted maximum matching problem \cite{filtering}. The input to this algorithm is a simple graph, G=(V,E), and a weight function \(w : E \to R\). Denote by W the maximum weight.
+We now consider the algorithm for computing an 8-approximation of the weighted maximum matching problem \cite{filtering}. The input to this algorithm is a simple graph, \(G=(V,E)\), and a weight function \(w : E \to R\). Denote by \(W\) the maximum weight.
 
-The Algorithm operates as follows: Split G into \(G1,G2, ...  ,G_{ceil(log W)}\), where Gi is the graph on the set V of vertices and the subset of edges in E with weights from \(2^{i-1}\) to \(2^{i}\). For \(1 \leq i \leq ceil(log W)\) run the maximal matching algorithm described above on \(G_i\) and let \(M_i\) be the matching for \(G_i\). Now consider the matchings in descending order from M\(_{ceil(log W)}\) to \(M_1\). When considering an edge e in \(M_i\), we add it to the final matching M if \(M \cup {e}\) is a valid matching, i.e if e is not in conflict with any other edge already in M. After all edges are considered, return M.
+The Algorithm operates as follows: Split \(G\) into \(G_1,G_2, ...  ,G_{\lceil\log W\rceil}\), where \(G_i\) is the graph on the set \(V\) of vertices and the subset of edges in \(E\) with weights from \(2^{i-1}\) to \(2^{i}\). For \(1 \leq i \leq \lceil\log W\rceil\) run the maximal matching algorithm described above on \(G_i\) and let \(M_i\) be the matching for \(G_i\). Now consider the matchings in descending order from M\(_{\lceil\log W\rceil}\) to \(M_1\). When considering an edge \(e\) in \(M_i\), we add it to the final matching \(M\) if \(M \cup \{e\}\) is a valid matching, \emph{i.e} if \(e\) is not in conflict with any other edge already in \(M\). After all edges are considered, return \(M\).
 
-The above algorithm is an 8-approximation to the weighted maximum matching problem. Let OPT be the optimal solution on G. Let e=(u,v) belong to OPT and e belong to \(G_j\) for some j. Since we are selecting edges from the matchings in descending order, we might pick an edge from \(M_i\) for \(i \geq j\) incident on either u or v such that e is blocked and cannot be picked later. It can be shown that:
+The above algorithm is an 8-approximation to the weighted maximum matching problem. Let \(OPT\) be the optimal solution on \(G\). Let \(e=(u,v)\) belong to \(OPT\) and e belong to \(G_j\) for some \(j\). Since we are selecting edges from the matchings in descending order, we might pick an edge from \(M_i\) for \(i \geq j\) incident on either \(u\) or \(v\) such that \(e\) is blocked and cannot be picked later. It can be shown that:
 
 \[ \sum_{(u,v)\in M} w((u,v)) \geq \sum_{e\in OPT} w(e) \]
 We refer to Lemma 3.4 in \cite{filtering} for the full proof.
 
-Note that it is possible to run the above algorithm in MapReduce using only one more round than the maximal matching algorithm. In the first round we split up G into \(G1,G2, ...  ,G_{ceil(log W)}\), then we run the maximal matching algorithm in parallel on \(ceil(log W)\) machines. In the last round, we run the last step on a single machine resulting in a final matching M. 
+Note that it is possible to run the above algorithm in MapReduce using only one more round than the maximal matching algorithm. In the first round we split up \(G\) into \(G_1,G_2, ...  ,G_{\lceil\log W\rceil}\), then we run the maximal matching algorithm in parallel on \(\lceil\log W\rceil\) machines. In the last round, we run the last step on a single machine resulting in a final matching \(M\). 
 
 
