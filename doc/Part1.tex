@@ -67,17 +67,19 @@ The applied sequential algorithm is a linear time \(\frac{1}{2}\)-approximation 
 The goal of using this algorithm is to find a maximum weighted matching (MWM). The optimal solution to this algorithmic problem is a polynomial time algorithm which was first designed by J. Edmonds in 1965\cite{edmonds} using polynomial time. LAM gives an approximated solution in a linear computation time. It will provide a great advantage in the running time of larger datasets as the one we are using.
 
 \subsubsection{Description of the algorithm}
-The following pseudo-code outlines the structure of the algorithm.
+The pseudo-code in Algorithm 1 outlines the structure of the algorithm.
 
-\begin{lstlisting}
-LAM-Algorithm
-MLAM := Ø;
-WHILE (EØ)
-    take the locally heaviest edge {a,b}E;
-    add {a,b} to MLAM;
-remove all edges incident to a or b from E;
-ENDWHILE
-\end{lstlisting}
+\begin{algorithm}
+\caption{LAM-Algorithm}
+\begin{algorithmic}
+\STATE $M_{LAM} := \emptyset;$\\
+\WHILE{$E \neq \emptyset$}
+\STATE take a locally heaviest edge \{a,b\} $\in$ E;
+\STATE add \{a,b\} to $M_{LAM}$;
+\STATE remove all edges incident to a or b from E;
+\ENDWHILE
+\end{algorithmic}
+\end{algorithm}
 
 The algorithm starts with an empty matching \(M_{LAM}\) in which the edges recursively will be added during the execution and a set \(E\) containing all the edges between the vertices in the graph. It initiates by choosing an arbitrary edge \(e=\{a,b\}\) from \(E\) and starts checking if any of the adjacent edges to the two vertices \(a\) and \(b\) have a higher weight than \(e\). If such an edge is found it proceeds to that edge and applies the procedure. It continues until an edge is found where no adjacent edges have a higher weight than the current one. When the edge with the locally highest weight is found, it is added to \(M_{LAM}\) and all edges incident to the two vertices of the edge are removed from \(E\). The algorithm terminates when \(E\) is empty.
 
